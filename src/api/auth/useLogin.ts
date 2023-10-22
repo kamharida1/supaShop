@@ -1,33 +1,37 @@
-import {  useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabase";
-import { Alert } from "react-native";
-import * as SecureStore from "expo-secure-store";
+import * as SecureStore from 'expo-secure-store';
 
 
-export default function useLogin() { 
+interface Profile { 
+  email: string;
+  password: string;
+}
+
+export default function useCreateUser() {
   const queryClient = useQueryClient();
 
-  return useMutation(["login"], async ({
-    email,
-    password,
-  }: {
-    email: string;
-    password: string;
-    }) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+  return useMutation({
+    async mutationFn(profile: Profile) {
 
-    if (data) {
-      await SecureStore.setItemAsync("authKeyEmail", email);
-      await SecureStore.setItemAsync("authKeyPassword", password);
-    }
-    
-    if (error) Alert.alert("Error", "Error signing in. Please try again.");
+      const { data: insertData, error: SignUpError, } = await supabase.auth.signInWithPassword({
+        email: profile.email,
+        password: profile.password,
+      });
 
-    return data;
-  },
-  )
-}
+      if (insertData) {
+        await SecureStore.setItemAsync("authKeyEmail", profile.email);
+        await SecureStore.setItemAsync("authKeyPassword", profile.password);
+      }
+
+      if (SignUpError) {
+        throw new Error(SignUpError.message);
+      }
+    },
+    // onSuccess: (data) => {
+    //   queryClient.invalidateQueries(['signUp', data]);
+    // },
+  })
+ }
+
 

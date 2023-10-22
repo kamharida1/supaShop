@@ -3,7 +3,8 @@ import React, { useState } from 'react'
 
 import * as Yup from "yup";
 import { Field } from "formik";
-import KeyboardShift from '@fullstackcraft/react-native-keyboard-shift/lib/components/KeyboardShift';
+import KeyboardShift from  "@fullstackcraft/react-native-keyboard-shift";
+
 import { Screen } from '../../components/Screen';
 import { MotiText, MotiView } from 'moti';
 import tw from 'twrnc';
@@ -38,7 +39,7 @@ const validationSchema = Yup.object().shape({
 });
 
 const SignUp = () => {
-  const { mutate, isLoading } = useCreateUser();
+  const { mutate, isPending } = useCreateUser();
 
   const handleSignUp = async (values: FormValues) => { 
     const { email, password } = values;
@@ -58,7 +59,7 @@ const SignUp = () => {
         <AppForm
           initialValues={{ email: "", password: "", confirmPassword: "" }}
           validationSchema={validationSchema}
-          onSubmit= {handleSignUp}
+          onSubmit={handleSignUp}
         >
           <Field
             component={InputField}
@@ -93,14 +94,13 @@ const SignUp = () => {
             textContentType="password"
           />
           <MotiView style={tw`flex-row items-center justify-between my-4`}>
-            
             <Link href="/sign-in" style={tw`text-base text-sky-600`}>
               Already have an account? Sign In, instead.
             </Link>
           </MotiView>
           <ButtonSubmit
-            title={isLoading ? "Creating user..." : "Sign Up"}
-            disabled={isLoading}
+            title={isPending ? "Creating user..." : "Sign Up"}
+            disabled={isPending}
           />
         </AppForm>
       </Screen>

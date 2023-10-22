@@ -11,7 +11,7 @@ interface Profile {
 export default function useCreateUser() {
   const queryClient = useQueryClient();
 
-  return useMutation(['signUp'],{
+  return useMutation({
     async mutationFn(profile: Profile) {
      // Check if email is already in use
       const { data: userWithEmail } = await supabase

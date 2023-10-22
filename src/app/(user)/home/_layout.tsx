@@ -21,7 +21,7 @@ export default function HomeLayout() {
             headerShown: false,
           }}
         />
-        <Stack.Screen
+        {/* <Stack.Screen
           name="index"
           options={{
             title: "Home",
@@ -37,7 +37,7 @@ export default function HomeLayout() {
               },
             },
           }}
-        />
+        /> */}
         {/* <Stack.Screen
           name="compose"
           options={{

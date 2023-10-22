@@ -1,105 +1,31 @@
-import { Link, Stack, useRouter } from "expo-router";
-import { Button, Platform, Pressable } from "react-native";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
+import { Link, Stack } from "expo-router";
+import { Pressable } from "react-native";
+import Colors from "../../../constants/Colors";
 
-import { Text } from "react-native";
-
-export default function HomeLayout() {
-  const router = useRouter();
-
+export default function HomeStack() {
   return (
-    <>
-      <Stack
-        screenOptions={{
-          headerTransparent: true,
-          headerBlurEffect: "systemMaterialLight",
+    <Stack>
+      <Stack.Screen
+        name="index"
+        options={{
+          title: "Products",
+          headerRight: () => (
+            <Link href="/(admin)/home/create" asChild>
+              <Pressable>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="plus-square-o"
+                    size={25}
+                    color={Colors.light.tint}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+            </Link>
+          ),
         }}
-      >
-        <Stack.Screen
-          name="index"
-          options={{
-            headerShown: false,
-          }}
-        />
-        {/* <Stack.Screen
-          name="index"
-          options={{
-            title: "Home",
-            headerRight: ComposeButton,
-            //headerLeft: ClearData,
-            headerLargeTitle: true,
-            headerSearchBarOptions: {
-              onChangeText: (event) => {
-                // Update the query params to match the search query.
-                router.setParams({
-                  q: event.nativeEvent.text,
-                });
-              },
-            },
-          }}
-        /> */}
-        {/* <Stack.Screen
-          name="compose"
-          options={{
-            title: "Create a new product",
-            presentation: "modal",
-            headerRight: Platform.select({
-              ios: DismissComposeButton,
-            }),
-          }}
-        /> */}
-      </Stack>
-    </>
-  );
-}
-
-function ComposeButton() {
-  const router = useRouter();
-
-  return (
-    <Link
-      href="/home/"
-      onPress={(ev) => {
-        ev.preventDefault();
-        router.push("/home/");
-      }}
-      asChild
-    >
-      <Pressable
-        style={{
-          flexDirection: "row",
-          display: "flex",
-          alignItems: "center",
-          paddingRight: 8,
-        }}
-      >
-        <Text
-          style={{
-            fontWeight: "normal",
-            paddingHorizontal: 8,
-            fontSize: 16,
-          }}
-        >
-          Add Product
-        </Text>
-        <FontAwesome5 name="arrow-circle-right" size={24} color="black" />
-      </Pressable>
-    </Link>
-  );
-}
-
-function DismissComposeButton() {
-  return (
-    <Link href="..">
-      <Text
-        style={{
-          fontWeight: "normal",
-          paddingHorizontal: 8,
-          fontSize: 16,
-        }}
-      >
-        Back
-      </Text>
-    </Link>
+      />
+    </Stack>
   );
 }

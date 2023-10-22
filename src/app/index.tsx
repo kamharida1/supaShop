@@ -24,6 +24,7 @@ const index = () => {
   useEffect(() => {
     const key = async (): Promise<void> => {
       try {
+        setLoading(true);
         const email = await SecureStore.getItemAsync("authKeyEmail");
         const password = await SecureStore.getItemAsync("authKeyPassword");
 
@@ -55,11 +56,11 @@ const index = () => {
     key()
   }, []);
 
-  // if (loading) return (
-  //   <View style={{ flex: 1, justifyContent: "center", padding: 10 }}>
-  //     <ActivityIndicator size="large" color="#0000ff" />
-  //   </View>
-  // )
+  if (loading) return (
+    <View style={{ flex: 1, justifyContent: "center", padding: 10 }}>
+      <ActivityIndicator size="large" color="#0000ff" />
+    </View>
+  )
 
   // if (user?.group === "admin") {
   //   return <Redirect href="/(admin)" />;
@@ -70,9 +71,9 @@ const index = () => {
   if (user) {
     // If the user is logged in and has a certain group, redirect to a specific route
     if (user.group === "admin") {
-      return <Redirect href="/(admin)" />;
+      return <Redirect href="/(admin)/home" />;
     } else {
-      return <Redirect href="/(user)" />;
+      return <Redirect href="/(user)/home" />;
     }
   }
 

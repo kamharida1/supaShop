@@ -29,7 +29,7 @@ const validationSchema = Yup.object().shape({
 export default function SignIn() {
   const [userInfo, setUserInfo] = useState({ email: "", password: "" });
 
-  const { mutate, error, isLoading, isSuccess } = useLogin()
+  const { mutate, error, isPending, isSuccess } = useLogin()
   
   const handleSignIn = async (values: { email: string; password: string }) => {
     const { email, password } = values;
@@ -90,8 +90,8 @@ export default function SignIn() {
             </Link>
           </MotiView>
           <ButtonSubmit
-            title={isLoading ? "Signing in..." : "Sign In"}
-            disabled={isLoading}
+            title={isPending ? "Signing in..." : "Sign In"}
+            disabled={isPending}
           />
         </AppForm>
       </Screen>

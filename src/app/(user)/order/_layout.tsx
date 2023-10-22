@@ -6,7 +6,7 @@ export default function OrderLayout() {
       screenOptions={{
         headerTransparent: true,
         headerBlurEffect: "systemMaterialLight",
-        //headerShown: false,
+        headerShown: false,
       }}
     />
   );
