@@ -146,9 +146,9 @@ export interface Database {
           id: string
           image: string | null
           images: string[] | null
-          oldPrice: number | null
+          old_price: number | null
           price: number | null
-          product_datails: Json | null
+          product_details: Json | null
           ratings: number | null
           sub_category: string | null
           title: string | null
@@ -163,9 +163,9 @@ export interface Database {
           id?: string
           image?: string | null
           images?: string[] | null
-          oldPrice?: number | null
+          old_price?: number | null
           price?: number | null
-          product_datails?: Json | null
+          product_details?: Json | null
           ratings?: number | null
           sub_category?: string | null
           title?: string | null
@@ -180,9 +180,9 @@ export interface Database {
           id?: string
           image?: string | null
           images?: string[] | null
-          oldPrice?: number | null
+          old_price?: number | null
           price?: number | null
-          product_datails?: Json | null
+          product_details?: Json | null
           ratings?: number | null
           sub_category?: string | null
           title?: string | null

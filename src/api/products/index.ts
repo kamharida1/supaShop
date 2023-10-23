@@ -59,7 +59,22 @@ export const useUpdateProduct = () => {
     async mutationFn(data: any) {
       const { data: product, error } = await supabase
         .from('products')
-        .update(data)
+        .update({
+          name: data.name,
+          price: data.price,
+          description: data.description,
+          title: data.title,
+          image: data.image,
+          images: data.images,
+          count: data.count,
+          category: data.category,
+          brand: data.brand,
+          rating: data.rating,
+          avg_rating: data.avg_rating,
+          product_details: data.product_details,
+          sub_category: data.sub_category,
+          
+        })
         .eq('id', data.id)
         .select()
         .single();

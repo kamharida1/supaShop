@@ -11,7 +11,7 @@ const Button = forwardRef<View | null, ButtonProps>(
     return (
       <Pressable ref={ref} {...pressableProps} style={styles.container}>
         {({ pressed }) => (
-          <View style= {{ backgroundColor: pressed ? '#eee': Colors.light.tint}}> 
+          <View style= {{ backgroundColor: pressed ? '#000': Colors.light.tint}}> 
             <Text style={styles.text}>{text}</Text>
           </View>
         )}

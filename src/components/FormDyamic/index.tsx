@@ -39,17 +39,27 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ fields, onFieldChange }) => {
             // <Input
             //   onChangeText={(value) => onFieldChange(field.label, value)}
             // />
-            <InputField
-              onChangeText={(value: string) => onFieldChange(field.label, value)}
+            <TextInput
+              onChangeText={(value: string) =>
+                onFieldChange(field.label, value)
+              }
               placeholder="Enter text here"
+              style={styles.input}
             />
           ) : (
-              <RNPickerSelect
-                onValueChange={(value: string) => onFieldChange(field.label, value)}
-                style={pickerSelectStyles}
-                placeholder={{label: "Select an option", value: null}}
-                items = {field.options?.map((option) => ({ label: option, value: option })) || []}
-              />
+            <RNPickerSelect
+              onValueChange={(value: string) =>
+                onFieldChange(field.label, value)
+              }
+              style={pickerSelectStyles}
+              placeholder={{ label: "Select an option", value: null }}
+              items={
+                field.options?.map((option) => ({
+                  label: option,
+                  value: option,
+                })) || []
+              }
+            />
           )}
         </View>
       ))}
@@ -61,7 +71,14 @@ const styles = StyleSheet.create({
   icon: {
     position: "absolute",
     right: 10,
-  }
+  },
+  input: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 5,
+    marginBottom: 20,
+  },
 });
 
 const pickerSelectStyles = StyleSheet.create({

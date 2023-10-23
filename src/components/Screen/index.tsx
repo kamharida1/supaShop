@@ -1,5 +1,8 @@
 import React from "react";
 import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleProp,
   StyleSheet,
@@ -18,22 +21,36 @@ interface Props extends ViewProps {
 const Screen: React.FC<Props> = ({ loading, scroll, style, children }) => {
   const insets = useSafeAreaInsets();
 
+ if (loading)
+   return (
+     <View style={{ flex: 1, justifyContent: "center", padding: 10 }}>
+       <ActivityIndicator size="large" color="#0000ff" />
+     </View>
+   );
+
   return scroll ? (
-    <ScrollView
-      testID="scrollview-screen"
-      contentInsetAdjustmentBehavior="automatic"
-      contentContainerStyle={[
-        {
-          flex: 1,
-          paddingBottom: insets.bottom,
-          paddingLeft: insets.left,
-          paddingRight: insets.right,
-        },
-        style,
-      ]}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{
+        flex: 1,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
+      }}
     >
-      {children}
-    </ScrollView>
+      <ScrollView
+        testID="scrollview-screen"
+        contentInsetAdjustmentBehavior="automatic"
+        contentContainerStyle={[
+          {
+            flexGrow: 1,
+          },
+          style,
+        ]}
+      >
+        <View style={{ height: 1000 }}>{children}</View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   ) : (
     <View
       testID="view-screen"
