@@ -26,6 +26,7 @@ const { width } = Dimensions.get("window");
 export default function CreateProductScreen() {
  const [title, setTitle] = useState("");
  const [description, setDescription] = useState("");
+ const [uploadedImages, setUploadedImages] = useState<string[]>([]);
  const [selectedImages, setSelectedImages] = useState<string[]>([]);
  const [image, setImage] = useState("");
  const [category, setCategory] = useState("");
@@ -59,7 +60,7 @@ export default function CreateProductScreen() {
     if (updatingProduct) {
       setTitle(updatingProduct.title || ""); // Ensure title is not null
       setDescription(updatingProduct.description || ""); // Ensure description is not null
-      setSelectedImages(updatingProduct.images || []); // Ensure images is not null
+      setUploadedImages(updatingProduct.images || []); // Ensure images is not null
       setImage(updatingProduct.image || ""); // Ensure image is not null
       setCategory(updatingProduct.category || ""); // Ensure category is not null
       setAvgRating(updatingProduct.avg_rating?.toString() || "0"); // Ensure avg_rating is not null
@@ -76,7 +77,7 @@ export default function CreateProductScreen() {
   const resetFields = () => {
     setTitle("");
     setDescription("");
-    setSelectedImages([]);
+    setUploadedImages([]);
     setImage("");
     setCategory("");
     setAvgRating("0");
@@ -153,87 +154,68 @@ export default function CreateProductScreen() {
   }
 
  
-  const onCreate = async () => { 
+  const onCreate = () => { 
     if (!validateInput()) {
       return;
     }
-    try {
-      const imagePaths = await Promise.all(
-        selectedImages.map(async (uri, index) => {
-          const imagePath = await uploadImage(uri, index);
-          return imagePath;
-        })
-      );
 
-      const product = {
-        title,
-        description,
-        images: imagePaths,
-        image: imagePaths[0],
-        brand,
-        category,
-        avg_rating: parseFloat(avg_rating),
-        ratings: parseInt(ratings),
-        count: parseInt(count),
-        price: parseFloat(price),
-        old_price: parseFloat(old_price),
-        sub_category,
-        product_details,
-      };
-      insertProduct(product, {
-        onSuccess: () => {
-          alert("Product created successfully");
-          resetFields();
-          router.back();
-        },
-      });
-    } catch (error) {
-      console.error("Error uploading images:", error);
+    const product = {
+      title,
+      description,
+      images: uploadedImages,
+      image: uploadedImages[0],
+      brand,
+      category,
+      avg_rating: parseFloat(avg_rating),
+      ratings: parseInt(ratings),
+      count: parseInt(count),
+      price: parseFloat(price),
+      old_price: parseFloat(old_price),
+      sub_category,  
+      product_details,
     }
+    insertProduct(product, {
+      onSuccess: () => {
+        alert("Product created successfully");
+        resetFields();
+        router.back();
+      },
+      onError: (error) => {
+        alert(error.message);
+      },
+    });
   }
 
-  const onUpdate = async() => {
+  const onUpdate = () => {
     if (!validateInput()) {
       return;
     }
 
-    try {
-      const imagePaths = await Promise.all(
-        selectedImages.map(async (uri, index) => {
-          const imagePath = await uploadImage(uri, index);
-          return imagePath;
-        })
-      );
-      updateProduct(
-        {
-          id,
-          title,
-          description,
-          images: imagePaths,
-          image: imagePaths[0],
-          brand,
-          category,
-          avg_rating: parseFloat(avg_rating),
-          ratings: parseInt(ratings),
-          count: parseInt(count),
-          price: parseFloat(price),
-          old_price: parseFloat(old_price),
-          sub_category,
-          product_details,
-        },
-        {
-          onSuccess: () => {
-            alert("Product updated successfully");
-            resetFields();
-            router.back();
-          },
-        }
-      );
-    } catch (error) {
-      console.error("Error uploading images:", error);
-    }
-
-    
+    updateProduct({
+      id,
+      title,
+      description,
+      images: uploadedImages,
+      image: uploadedImages[0],
+      brand,
+      category,
+      avg_rating: parseFloat(avg_rating),
+      ratings: parseInt(ratings),
+      count: parseInt(count),
+      price: parseFloat(price),
+      old_price: parseFloat(old_price),
+      sub_category,  
+      product_details,
+    }, {
+      onSuccess: () => {
+        alert("Product updated successfully");
+        resetFields();
+        router.back();
+      },
+      onError: (error) => {
+        alert(error.message);
+      },
+    });
   }
 
   const onDelete = () => { 
@@ -261,30 +243,6 @@ export default function CreateProductScreen() {
       },
     ]);
   };
-
-const uploadImage = async (image: string, index: number) => {
-  if (!image?.startsWith("file://")) {
-    return;
-  }
-
-  const base64 = await FileSystem.readAsStringAsync(image, {
-    encoding: "base64",
-  });
-  const filePath = `${randomUUID()}.png`;
-  const contentType = "image/png";
-
-  const { data, error } = await supabase.storage
-    .from("product-images")
-    .upload(filePath, decode(base64), { contentType });
-
-  if (error) {
-    console.log(error);
-  }
-
-  if (data) {
-    return data.path;
-  }
-};
 
   const handleCategoryChange = (value: string) => { 
     setCategory(value);
@@ -319,6 +277,53 @@ const uploadImage = async (image: string, index: number) => {
       setSelectedImages(result.assets.map(({ uri }) => uri));
     } else {
       alert("You haven't selected any image");
+    }
+  };
+
+  const uploadImages = async () => {
+    setIsLoading(true);
+
+    const validSelectedImages = selectedImages.filter(
+      (uri) => uri && uri.startsWith("file://")
+    );
+
+    const uploadPromises = validSelectedImages.map(async (uri) => {
+
+      const base64 = await FileSystem.readAsStringAsync(uri!, {
+        encoding: "base64",
+      });
+
+      const filePath = `${randomUUID()}.png`;
+      const contentType = "image/png";
+
+      try {
+        const { data, error } = await supabase.storage
+          .from("product-images")
+          .upload(filePath, decode(base64), { contentType });
+
+        if (data) {
+          return data.path;
+        } else {
+          throw new Error(error.message);
+        }
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    });
+
+    const uploadedPaths = await Promise.all(uploadPromises);
+
+    setIsLoading(false);
+
+    const successfulUploads = uploadedPaths.filter((path) => path !== null) as string[];
+
+    if (successfulUploads.length === validSelectedImages.length) {
+      setUploadedImages([...uploadedImages, ...successfulUploads]);
+      //setSelectedImages([]);
+      setSuccessMessage("Images uploaded successfully");
+    } else {
+      setError("Error uploading one or more images. Please try again. ");
     }
   };
 
@@ -415,6 +420,16 @@ const uploadImage = async (image: string, index: number) => {
             </View>
           ))}
         </View>
+        <Button
+          text="Upload Images"
+          onPress={uploadImages}
+          style={{ marginTop: 10 }}
+        />
+        {isLoading && <Text>Uploading...</Text>}
+        {error && <Text style={{ color: "red" }}>{error}</Text>}
+        {successMessage && (
+          <Text style={{ color: "green" }}>{successMessage}</Text>
+        )}
         <Space height={20} />
         <View
           style={tw` flex-row  bg-white border-[1.5px] rounded-md h-13 justify-between px-2 border-slate-300 items-center relative`}
